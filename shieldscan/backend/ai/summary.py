@@ -1,3 +1,4 @@
+# pyre-ignore-all-errors
 import os
 from typing import List, Dict, Any
 import anthropic

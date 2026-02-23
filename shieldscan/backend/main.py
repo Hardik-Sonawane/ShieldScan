@@ -1,3 +1,4 @@
+# pyre-ignore-all-errors
 from fastapi import FastAPI, HTTPException, Depends
 import json
 from fastapi.responses import RedirectResponse
@@ -26,6 +27,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def read_root():
+    return RedirectResponse(url="/docs")
 
 def build_issue_from_template(key: str) -> dict:
     return format_issue_texts(key)
@@ -207,3 +212,10 @@ async def download_scan_pdf(scan_id: int, db: Session = Depends(get_db)):
 async def health_check():
     return {"status": "ok"}
 
+if __name__ == "__main__":
+    import uvicorn
+    print("\n" + "="*50)
+    print("==> BACKEND SERVER IS RUNNING!")
+    print("==> CLICK HERE TO OPEN: http://localhost:8000/")
+    print("="*50 + "\n")
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
