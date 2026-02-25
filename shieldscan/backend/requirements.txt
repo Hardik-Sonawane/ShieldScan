@@ -5,6 +5,6 @@ psycopg2-binary
 pydantic
 playwright
 jinja2
-anthropic
+groq
 python-dotenv
 requests

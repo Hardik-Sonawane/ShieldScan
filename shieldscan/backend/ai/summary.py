@@ -1,7 +1,7 @@
 # pyre-ignore-all-errors
 import os
 from typing import List, Dict, Any
-import anthropic
+import groq
 
 def generate_summary(score: int, grade: str, issues: List[Dict[str, Any]]) -> str:
     """
@@ -9,23 +9,22 @@ def generate_summary(score: int, grade: str, issues: List[Dict[str, Any]]) -> st
     """
     critical_count = len([i for i in issues if i.get('difficulty') == 'Medium' or i.get('difficulty') == 'Advanced'])
     
-    api_key = os.getenv("CLAUDE_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if api_key and api_key != "your-api-key":
         try:
-            client = anthropic.Anthropic(api_key=api_key)
+            client = groq.Groq(api_key=api_key)
             issues_text = "\n".join([f"- {i.get('title')}: {i.get('impact')}" for i in issues])
             prompt = f"You are a professional security analyst. The user's website has been scanned and received a score of {score}/100 and a grade of {grade}. The following issues were found:\n{issues_text}\nWrite a short, professional, and directly addressed 2-3 sentence executive summary of these security results. Make it sound helpful but urgent."
             
-            message = client.messages.create(
-                model="claude-3-haiku-20240307",
-                max_tokens=200,
+            message = client.chat.completions.create(
+                model="llama3-8b-8192",
                 messages=[
                     {"role": "user", "content": prompt}
                 ]
             )
-            return message.content[0].text
+            return message.choices[0].message.content
         except Exception as e:
-            print("Anthropic API Error:", e)
+            print("Groq API Error:", e)
 
     # Fallback if no API key or API call failed
     summary = f"Your website scored a {score}/100 ({grade}). "
