@@ -51,7 +51,8 @@ export default function Home() {
   }, []);
 
   const handleCheckout = () => {
-    window.location.href = `http://localhost:8000/api/checkout?site=${encodeURIComponent(result?.url || "")}`;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    window.location.href = `${apiUrl}/api/checkout?site=${encodeURIComponent(result?.url || "")}`;
   };
 
   const setExpanded = (i: number) => {
@@ -78,7 +79,8 @@ export default function Home() {
     setResult(null);
 
     try {
-      const res = await fetch("http://localhost:8000/api/scan", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const res = await fetch(`${apiUrl}/api/scan`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -116,15 +118,15 @@ export default function Home() {
             <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">ShieldScan</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
-            <a href="#" className="hover:text-white transition-colors">How it works</a>
-            <a href="#" className="hover:text-white transition-colors">Pricing</a>
-            <a href="#" className="hover:text-white transition-colors">Trust Center</a>
+            <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
+            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+            <a href="#trust" className="hover:text-white transition-colors">Trust Center</a>
           </nav>
           <div className="flex items-center gap-4 text-sm font-medium">
-            <a href="#" className="text-slate-400 hover:text-white transition-colors">Log in</a>
-            <button className="bg-white text-slate-950 px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors">
+            <a href="/auth/login" className="text-slate-400 hover:text-white transition-colors">Log in</a>
+            <a href="/auth/login" className="bg-white text-slate-950 px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors inline-block text-center cursor-pointer">
               Get Started
-            </button>
+            </a>
           </div>
         </div>
       </header>
@@ -185,7 +187,7 @@ export default function Home() {
                     className="mt-1 sm:mt-0 w-4 h-4 rounded border-white/20 bg-slate-900 text-emerald-500 outline-none accent-emerald-500 cursor-pointer"
                   />
                   <label htmlFor="auth-check" className="cursor-pointer">
-                    I confirm I have authorization to scan this domain and agree to the <a href="#" className="underline hover:text-white transition-colors">Terms of Service</a> & <a href="#" className="underline hover:text-white transition-colors">Privacy Policy</a>.
+                    I confirm I have authorization to scan this domain and agree to the <a href="#terms" className="underline hover:text-white transition-colors">Terms of Service</a> & <a href="#privacy" className="underline hover:text-white transition-colors">Privacy Policy</a>.
                   </label>
                 </div>
               </form>
@@ -246,7 +248,7 @@ export default function Home() {
 
                     {isPremium && (
                       <a
-                        href={`http://localhost:8000/api/scans/${result.id}/pdf`}
+                        href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/scans/${result.id}/pdf`}
                         download
                         target="_blank"
                         rel="noreferrer"
@@ -419,7 +421,7 @@ export default function Home() {
 
               {/* The Upgrade Prompt */}
               {result.issues.length > 3 && !isPremium && (
-                <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-3xl p-8 text-center relative overflow-hidden mt-12">
+                <div id="pricing" className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-3xl p-8 text-center relative overflow-hidden mt-12">
                   <div className="absolute -inset-24 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 blur-3xl opacity-50"></div>
                   <div className="relative z-10 max-w-2xl mx-auto space-y-6">
                     <Lock className="w-12 h-12 text-emerald-400 mx-auto" />
@@ -429,7 +431,7 @@ export default function Home() {
                     </p>
                     <button
                       onClick={handleCheckout}
-                      className="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-4 px-10 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]"
+                      className="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-4 px-10 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] cursor-pointer"
                     >
                       Get Premium Report
                     </button>
@@ -450,6 +452,99 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Dynamic Information Sections */}
+        {!result && !isScanning && (
+          <div className="mt-32 space-y-32 border-t border-white/5 pt-20">
+            {/* How It Works Section */}
+            <section id="how-it-works" className="max-w-4xl mx-auto text-center scroll-mt-24">
+              <h2 className="text-3xl font-bold mb-8">How ShieldScan Works</h2>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+                  <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 text-emerald-400 font-bold text-xl">1</div>
+                  <h3 className="font-semibold text-lg mb-2">Scan Your Domain</h3>
+                  <p className="text-slate-400 text-sm">Enter your URL. Our engines instantly audit SSL, headers, open ports, and API endpoints.</p>
+                </div>
+                <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+                  <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 text-emerald-400 font-bold text-xl">2</div>
+                  <h3 className="font-semibold text-lg mb-2">AI Analysis</h3>
+                  <p className="text-slate-400 text-sm">Our AI summarizes your vulnerabilities based on exploitability and business risk.</p>
+                </div>
+                <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+                  <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 text-emerald-400 font-bold text-xl">3</div>
+                  <h3 className="font-semibold text-lg mb-2">Copy-Paste Fixes</h3>
+                  <p className="text-slate-400 text-sm">Get exact code snippets tailored for Nginx, Express, and others to patch holes fast.</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Pricing Details */}
+            <section id="pricing" className="max-w-4xl mx-auto text-center scroll-mt-24">
+              <h2 className="text-3xl font-bold mb-8">Simple, Transparent Pricing</h2>
+              <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+                <div className="bg-slate-900 border border-white/5 rounded-2xl p-8 text-left hover:border-emerald-500/30 transition-colors">
+                  <h3 className="text-xl font-semibold mb-2">Single Report PDF</h3>
+                  <div className="text-4xl font-bold text-emerald-400 mb-4">$10<span className="text-lg text-slate-500 font-normal"> /one-time</span></div>
+                  <ul className="space-y-3 text-slate-400 text-sm mb-8">
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Full vulnerability list</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Executive AI Summary</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Exact code fix snippets</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Downloadable PDF format</li>
+                  </ul>
+                  <a href="/auth/login" className="block text-center bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-lg font-medium transition-colors">Get Started</a>
+                </div>
+                <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-8 text-left relative overflow-hidden">
+                  <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400"></div>
+                  <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">Most Popular</div>
+                  <h3 className="text-xl font-semibold mb-2">Pro Subscription</h3>
+                  <div className="text-4xl font-bold text-white mb-4">$29<span className="text-lg text-slate-500 font-normal"> /month</span></div>
+                  <ul className="space-y-3 text-slate-400 text-sm mb-8">
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Everything in Single Report</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Unlimited scans mapped to history</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Personalized dashboard access</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Automated weekly monitoring</li>
+                  </ul>
+                  <a href="/auth/login" className="block text-center bg-emerald-500 hover:bg-emerald-400 text-white py-3 rounded-lg font-medium transition-colors shadow-lg shadow-emerald-500/20">Subscribe Now</a>
+                </div>
+              </div>
+            </section>
+
+            {/* Trust Center / Security */}
+            <section id="trust" className="max-w-3xl mx-auto scroll-mt-24 text-left bg-slate-900/50 p-8 rounded-2xl border border-white/5">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-3"><Shield className="text-emerald-500" /> Trust & Security</h2>
+              <p className="text-slate-400 mb-4 leading-relaxed">
+                ShieldScan operates under strict, non-intrusive scanning principles. We do not attempt SQL Injection, cross-site scripting (XSS), or deploy malicious payloads against your infrastructure.
+              </p>
+              <p className="text-slate-400 leading-relaxed">
+                Our requests act exactly like a standard modern web browser or search engine crawler. We simply observe the public exposure of your headers, configurations, and surface-level file structures to warn you before a malicious actor discovers them.
+              </p>
+            </section>
+
+            {/* Terms & Privacy */}
+            <section id="terms" className="max-w-4xl mx-auto scroll-mt-24 text-left pb-12">
+              <div className="grid md:grid-cols-2 gap-12">
+                <div>
+                  <h2 className="text-xl font-bold mb-4">Terms of Service</h2>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                    By using ShieldScan, you attest that you have explicit, documented authorization to run automated security audits against the provided domain.
+                  </p>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    Unauthorized usage against third-party entities is strictly prohibited. All scan requests establish an audit trail connected to your IP address for abuse prevention.
+                  </p>
+                </div>
+                <div id="privacy" className="scroll-mt-24">
+                  <h2 className="text-xl font-bold mb-4">Privacy Policy</h2>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                    We do not sell or index your scan results. Historical data is securely encrypted in transit and exclusively visible to authenticated accounts linked to the scan.
+                  </p>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    Card payments are strictly processed via Stripe. We do not touch, capture, or retain raw payment instrumentation data.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
       </main>
 
       {/* Footer */}
@@ -470,9 +565,9 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-6 text-sm font-medium text-slate-400">
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Security</a>
+            <a href="#terms" className="hover:text-white transition-colors">Terms</a>
+            <a href="#privacy" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#trust" className="hover:text-white transition-colors">Security</a>
           </div>
         </div>
       </footer>

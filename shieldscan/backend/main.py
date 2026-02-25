@@ -11,9 +11,11 @@ from scanners.checkers import check_headers, check_cors, check_mcp_exposure, che
 from ai.summary import format_issue_texts, generate_summary
 
 # Database imports
-from database import engine, get_db, Base
+from database import engine, get_db, Base, SQLALCHEMY_DATABASE_URL
 import models.db
 from sqlalchemy.orm import Session
+
+print("USING DB URL:", SQLALCHEMY_DATABASE_URL)
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
